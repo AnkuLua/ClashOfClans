@@ -3,18 +3,18 @@ function existsClickAll(target, seconds)
     usePreviousSnap(true)
     local all = findAll(target, 0)
     usePreviousSnap(false)
-    for i, r in ipairs(all) do
-        r:highlight()
-    end
+--    for i, r in ipairs(all) do
+--        r:highlight()
+--    end
 
 --    wait(2)
 --    for i, r in ipairs(all) do
 --        r:highlight()
 --    end
 --
---    for i, r in ipairs(all) do
---        click(r)
---    end
+    for i, r in ipairs(all) do
+        click(r)
+    end
 end
 
 function upgrade(index) -- endtarget, startLevel, maxLevel)
@@ -64,6 +64,7 @@ setImmersiveMode(true)
 Settings:set("MinSimilarity", 0.7)
 -- ==========  main program ===========
 upgradeLocation = Location(640, 550)
+alive = Location(300, 160) -- keep the game alive
 collectItems = {"goldCollect.png", "goldCollect2.png",
     "elixirCollect.png", "elixirCollect2.png", "elixirCollect3.png",
     "darkElixirCollect.png"}
@@ -89,6 +90,7 @@ while (true) do
         existsClickAll(r)
     end
 
+    click(alive)
 --    if (not exists("builderZero.png")) then
 --        upgrade(upgradeIndex)
 --        if (upgradeIndex == upgradeTotal) then
@@ -96,8 +98,9 @@ while (true) do
 --        else
 --            upgradeIndex = upgradeIndex + 1
 --        end
+--        click(alive)
 --    end
 
 
-    wait(5)
+    wait(1)
 end

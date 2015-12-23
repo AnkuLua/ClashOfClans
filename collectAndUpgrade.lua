@@ -1,21 +1,3 @@
-function existsClickAll(target, seconds)
-    if (not exists(target, seconds)) then return end
-    usePreviousSnap(true)
-    local all = findAll(target, 0)
-    usePreviousSnap(false)
---    for i, r in ipairs(all) do
---        r:highlight()
---    end
-
---    wait(2)
---    for i, r in ipairs(all) do
---        r:highlight()
---    end
---
-    for i, r in ipairs(all) do
-        click(r)
-    end
-end
 
 function upgrade(index) -- endtarget, startLevel, maxLevel)
     local target = upgradeItems[index]
@@ -47,7 +29,9 @@ function upgrade(index) -- endtarget, startLevel, maxLevel)
         do return end
     end
 
-    upgradeLevel[target] = level + 1
+    if (level < maxLevel) then
+        upgradeLevel[target] = level + 1
+    end
 
 end
 
@@ -67,26 +51,31 @@ end
 Settings:setCompareDimension(true, 1280)
 Settings:setScriptDimension(true, 1280)
 setImmersiveMode(true)
+localPath = scriptPath()
+dofile(localPath.."lib/COCLib.lua")
 Settings:set("MinSimilarity", 0.7)
 -- ==========  main program ===========
 center = Region(100, 100, 1080, 600)
 upgradeLocation = Location(640, 550)
 alive = Location(300, 160) -- keep the game alive
+reload = Location(640, 440)
 collectItems = {"goldCollect.png", "goldCollect2.png",
     "elixirCollect.png", "elixirCollect2.png", "elixirCollect3.png",
     "darkElixirCollect.png"}
 --upgradeItems = {"goldMine", "elixirCollector", "goldStorage", "elixirStorage", "barracks",
 --    "armyCamp",          "cannon" }
-upgradeItems = {"goldStorage", "elixirStorage" }
+upgradeItems = {"goldMine", "elixirStorage" }
+--upgradeItems = {"research"} --, "elixirStorage" }
 --upgradeItems = {"elixirStorage" }
 upgradeMax = {}
 upgradeMax["goldMine"] = 3
 upgradeMax["elixirCollector"] = 6
-upgradeMax["goldStorage"] = 5
-upgradeMax["elixirStorage"] = 5
+upgradeMax["goldStorage"] = 11
+upgradeMax["elixirStorage"] = 11
 upgradeMax["barracks"] = 2
 upgradeMax["armyCamp"] = 1
 upgradeMax["cannon"] = 1
+upgradeMax["research"] = 2
 --upgradeMax   = {         3,                 3,             4,               3,          2,
 --                         1,                 1 }
 --upgradeLevel = {         1,                 1,             1,               1 }
@@ -94,15 +83,14 @@ upgradeIndex = 1
 upgradeTotal = table.getn(upgradeItems)
 upgradeLevel = {}
 for i, r in ipairs(upgradeItems) do
-    upgradeLevel[r] = 4
+    upgradeLevel[r] = 1 --0 -- 4
 end
 
+collectCount = 1
+reloadCount = 0
+
 while (true) do
-    --    zoom(200, 600, 600, 400, 1000, 170, 700, 300, 50)
-    zoom(100, 285, 540, 285, 1180, 285, 740, 285, 50)
-    wait(2)
-    --    zoom(200, 600, 600, 400, 1000, 170, 700, 300, 50)
-    zoom(100, 285, 540, 285, 1180, 285, 740, 285, 50)
+    zoomout()
 
 --eraseStone()
 
@@ -113,8 +101,8 @@ while (true) do
         for i, r in ipairs(collectItems) do
             existsClickAll(r)
         end
-
         click(alive)
+
         if (not exists("builderZero.png")) then
             upgrade(upgradeIndex)
             if (upgradeIndex == upgradeTotal) then
@@ -127,24 +115,38 @@ while (true) do
 
 
         if (center:exists(Pattern("supercellLogo.png"):similar(0.8), 0)) then
+            getLastMatch():highlight(2)
             toast("Disconnected")
-            --            getLastMatch():highlight(5)
-            --            print(getLastMatch():getScore())
-            do return end
             break
         end
 
+        toast("Collect count: " .. collectCount .. "\nReload count: " .. reloadCount)
+        collectCount = collectCount + 1
         wait(1)
+
     end
 
     while (true) do
         click(reload)
-        wait(3)
-        if (not center:exists(Pattern("supercellLogo.png"):similar(0.8), 5)) then break end
+        wait(1)
+        click(alive)
+        wait(1)
+--        if (not center:exists(Pattern("supercellLogo.png"):similar(0.8), 5)) then break end
+        if (exists("trophy.png", 5)) then break end
         toast("Disconnected")
 
-        wait(60)
+        wait(5) --60)
     end
-    wait(5)
+
+    click(alive)
+    while (existsClick("cancel.png", 0)) do
+        wait(1)
+    end
+    wait(1)
+    click(alive)
+
+
+    reloadCount = reloadCount + 1
+--    exists("trophy.png", 15)
 
 end
